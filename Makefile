@@ -33,4 +33,3 @@ stop:
 clean:
 	rm -rf 1/cakenet
 	rm -rf 2/cakenet
-	tar zxvf syscoin.tgz
