@@ -1,36 +1,40 @@
-SYSCOIND=syscoind
-SYSCOINCLI=syscoin-cli
-S1_FLAGS=
-S2_FLAGS=
-S1=$(SYSCOINCLI) -datadir=1 -daemon=1 $(S1_FLAGS)
-S2=$(SYSCOINCLI) -datadir=2 -daemon=1 $(S2_FLAGS)
+BITCOIND=bitcoind
+BITCOINGUI=bitcoin-qt
+BITCOINCLI=bitcoin-cli
+B1_FLAGS=
+B2_FLAGS=
+B1=-datadir=1 $(B1_FLAGS)
+B2=-datadir=2 $(B2_FLAGS)
+BLOCKS=1
+ADDRESS=
+AMOUNT=
+ACCOUNT=
 
 start:
-	$(SYSCOINCD) -datadir=1 -daemon=1 $(S1_FLAGS)
-	$(SYSCOINCD) -datadir=1 -daemon=1 $(S2_FLAGS)
-	
-generate-true:
-	$(S1) setgenerate true
-	
-generate-false:
-	$(S1) setgenerate false
-	
+	$(BITCOIND) $(B1) -daemon
+	$(BITCOIND) $(B2) -daemon
+
+start-gui:
+	$(BITCOINGUI) $(B1) &
+	$(BITCOINGUI) $(B2) &
+
+generate:
+	$(BITCOINCLI) $(B1) generate $(BLOCKS)
+
 getinfo:
-	$(S1) getinfo
-	$(S2) getinfo
+	$(BITCOINCLI) $(B1) getinfo
+	$(BITCOINCLI) $(B2) getinfo
 
-getmininginfo: 
-	$(S1) getmininginfo
-	$(S2) getmininginfo
+send:
+	$(BITCOINCLI) $(B1) sendtoaddress $(ADDRESS) $(AMOUNT)
 
-getaccountaddress:
-	$(S1) getaccountaddress ""
-	$(S2) getaccountaddress ""
+address:
+	$(BITCOINCLI) $(B1) getnewaddress $(ACCOUNT)
 
 stop:
-	$(S1) stop
-	$(S2) stop
+	$(BITCOINCLI) $(B1) stop
+	$(BITCOINCLI) $(B2) stop
 
 clean:
-	rm -rf 1/testnet3
-	rm -rf 2/testnet3
+	find 1/regtest/* -not -name 'server.*' -delete
+	find 2/regtest/* -not -name 'server.*' -delete
